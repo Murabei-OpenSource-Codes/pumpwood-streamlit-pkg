@@ -1,11 +1,24 @@
 # pumpwood-streamlit-pkg
 Python Package to deploy Streamlit Dashboards at Pumpwood Systems.
 
+<p align="center" width="60%">
+  <img src="doc/sitelogo-horizontal.png" /> <br>
+
+  <a href="https://en.wikipedia.org/wiki/Cecropia">
+    Pumpwood is a native brasilian tree
+  </a> which has a symbiotic relation with ants (Murabei)
+</p>
+
 This packages help to deploy Streamlit Dashboard associated with Pumpwood
 based Systems registering routes at Kong for single end-point for all
 microservice.
 
-It implements an abstract class that should be inherited.
+It implements an abstract class that should be inherited. When rendering the
+dashboard, it uses cookie `PumpwoodAuthorization` to get authentication
+token and validates if user is logged at Pumpwood Auth microservice. If
+authentication token is not valid, `authentication_error_page` is
+called to render unauthorized page.
+
 
 Example using dashboard example made avaiable by Streamlit oficial
 website.
