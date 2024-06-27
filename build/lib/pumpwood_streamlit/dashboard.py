@@ -16,15 +16,12 @@ class PumpwoodStreamlitDashboard(ABC):
 
     def __init__(self):
         MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")
-        if MICROSERVICE_URL is None:
-            msg = (
-                "Enviment Variable MICROSERVICE_URL must be set to validate "
-                "user authentication.")
-            raise Exception(msg)
-
-        self._microservice = PumpWoodMicroService(
-            name="dashboard-microservice",
-            server_url=MICROSERVICE_URL)
+        if MICROSERVICE_URL is not None:
+            self._microservice = PumpWoodMicroService(
+                name="dashboard-microservice",
+                server_url=MICROSERVICE_URL)
+        else:
+            self._microservice = None
 
     def validate_authentication(self) -> bool:
         """
@@ -34,6 +31,9 @@ class PumpwoodStreamlitDashboard(ABC):
             Return True if user is logged on Pumpwood and False if token
             set at PumpwoodAuthorization is invalid.
         """
+        if self._microservice is None:
+            return True
+
         cookie_manager = _get_cookie_manager()
         auth_token = cookie_manager.get('PumpwoodAuthorization')
 
