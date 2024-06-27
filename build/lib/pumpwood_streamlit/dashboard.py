@@ -14,14 +14,33 @@ def _get_cookie_manager():
 class PumpwoodStreamlitDashboard(ABC):
     """Abstract Class to facilitate criation of Streamlit Dashboards."""
 
-    def __init__(self):
-        MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")
-        if MICROSERVICE_URL is not None:
-            self._microservice = PumpWoodMicroService(
-                name="dashboard-microservice",
-                server_url=MICROSERVICE_URL)
+    def __init__(self, microservice: PumpWoodMicroService = None):
+        """
+        __init__.
+
+        It is possible to init object with a microservice to help
+        building dashboard.
+
+        Kwargs:
+            microservice [PumpWoodMicroService]: An microservice can
+                be passed to object for developing and debug.
+        """
+        # Set auth_header to None, this will permit dev microservice to
+        # use credencials and prod get auth header from cookie
+        self._auth_token = None
+        if microservice is not None:
+            self._microservice = microservice
         else:
-            self._microservice = None
+            MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")
+            if MICROSERVICE_URL is not None:
+                self._microservice = PumpWoodMicroService(
+                    name="dashboard-microservice",
+                    server_url=MICROSERVICE_URL)
+            else:
+                msg = (
+                    "'microservice' is not set as argument and " +
+                    "'MICROSERVICE_URL' not set as enviroment variable")
+                raise Exception(msg)
 
     def validate_authentication(self) -> bool:
         """
@@ -31,18 +50,13 @@ class PumpwoodStreamlitDashboard(ABC):
             Return True if user is logged on Pumpwood and False if token
             set at PumpwoodAuthorization is invalid.
         """
-        if self._microservice is None:
-            return True
-
         cookie_manager = _get_cookie_manager()
-        auth_token = cookie_manager.get('PumpwoodAuthorization')
+        cookie_auth_token = cookie_manager.get('PumpwoodAuthorization')
+        if cookie_auth_token is not None:
+            self._auth_token = {"Authorization": 'Token ' + cookie_auth_token}
 
-        # If token not present, consider as not logged
-        if auth_token is None:
-            return False
-
-        is_logged = self._microservice.check_if_logged(auth_header={
-            "Authorization": 'Token ' + auth_token})
+        is_logged = self._microservice.check_if_logged(
+            auth_header=self._auth_token)
         return is_logged
 
     def authentication_error_page(self) -> None:
