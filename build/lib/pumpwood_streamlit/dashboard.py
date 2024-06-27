@@ -36,6 +36,11 @@ class PumpwoodStreamlitDashboard(ABC):
         """
         cookie_manager = _get_cookie_manager()
         auth_token = cookie_manager.get('PumpwoodAuthorization')
+
+        # If token not present, consider as not logged
+        if auth_token is None:
+            return False
+
         is_logged = self._microservice.check_if_logged(auth_header={
             "Authorization": 'Token ' + auth_token})
         return is_logged
