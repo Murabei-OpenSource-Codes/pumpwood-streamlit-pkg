@@ -19,7 +19,10 @@ token and validates if user is logged at Pumpwood Auth microservice. If
 authentication token is not valid, `authentication_error_page` is
 called to render unauthorized page.
 
+# Documentation Page
 
+
+# Example
 Example using dashboard example made avaiable by Streamlit oficial
 website.
 ```
