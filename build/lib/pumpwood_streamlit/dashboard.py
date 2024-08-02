@@ -10,7 +10,7 @@ from streamlit_cookies_controller import CookieController
 
 def _get_cookie_manager():
     """Retrieve Cookie Manager."""
-    return CookieController().get("PumpwoodAuthorization")
+    return CookieController()
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -59,6 +59,7 @@ class PumpwoodStreamlitDashboard(ABC):
             set at PumpwoodAuthorization is invalid.
         """
         cookie_manager = _get_cookie_manager()
+        print(cookie_manager.getAll())
         cookie_auth_token = cookie_manager.get("PumpwoodAuthorization")
         if cookie_auth_token is not None:
             self._auth_token = {"Authorization": "Token " + cookie_auth_token}
