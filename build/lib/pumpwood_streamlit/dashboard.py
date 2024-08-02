@@ -5,11 +5,12 @@ from abc import ABC, abstractmethod
 
 import streamlit as st
 from pumpwood_communication.microservices import PumpWoodMicroService
+from streamlit_cookies_controller import CookieController
 
 
 def _get_cookie_manager():
     """Retrieve Cookie Manager."""
-    return st.session_state.get("init", {})
+    return CookieController().get("PumpwoodAuthorization")
 
 
 class PumpwoodStreamlitDashboard(ABC):
