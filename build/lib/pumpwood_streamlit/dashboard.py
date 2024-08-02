@@ -9,7 +9,7 @@ from pumpwood_communication.microservices import PumpWoodMicroService
 
 def _get_cookie_manager():
     """Retrieve Cookie Manager."""
-    return st.session_state.get("init")
+    return st.session_state.get("init", {})
 
 
 class PumpwoodStreamlitDashboard(ABC):
