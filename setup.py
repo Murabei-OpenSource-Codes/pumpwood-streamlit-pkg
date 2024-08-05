@@ -39,7 +39,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     install_requires=[
-        "streamlit", "extra-streamlit-components"],
+        "streamlit", "extra-streamlit-components", "streamlit-cookies-controller"],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
 )
