@@ -58,9 +58,8 @@ class PumpwoodStreamlitDashboard(ABC):
             Return True if user is logged on Pumpwood and False if token
             set at PumpwoodAuthorization is invalid.
         """
-        cookie_manager = _get_cookie_manager()
-        print(cookie_manager.getAll())
-        cookie_auth_token = cookie_manager.get("PumpwoodAuthorization")
+        self.cookie_manager = _get_cookie_manager()
+        cookie_auth_token = self.cookie_manager.get("PumpwoodAuthorization")
         if cookie_auth_token is not None:
             self._auth_token = {"Authorization": "Token " + cookie_auth_token}
 
