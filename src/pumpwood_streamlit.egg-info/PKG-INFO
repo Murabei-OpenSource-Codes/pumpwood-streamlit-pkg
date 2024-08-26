@@ -1,24 +1,23 @@
 Metadata-Version: 2.1
 Name: pumpwood-streamlit
-Version: 0.5
+Version: 0.7
 Summary: Package to deploy Streamlit at Pumpwood Systems
 Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-communication
 Author: André Andrade Baceti
 Author-email: a.baceti@murabei.com
 License: BSD-3-Clause License
+Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
-Requires-Dist: streamlit
-Requires-Dist: extra-streamlit-components
 
 # pumpwood-streamlit-pkg
 Python Package to deploy Streamlit Dashboards at Pumpwood Systems.
 
 <p align="center" width="60%">
-  <img src="doc/sitelogo-horizontal.png" /> <br>
+  <img src="static_doc/sitelogo-horizontal.png" /> <br>
 
   <a href="https://en.wikipedia.org/wiki/Cecropia">
     Pumpwood is a native brasilian tree
@@ -35,7 +34,10 @@ token and validates if user is logged at Pumpwood Auth microservice. If
 authentication token is not valid, `authentication_error_page` is
 called to render unauthorized page.
 
+# Documentation Page
+You can check the doc page [here](https://murabei-opensource-codes.github.io/pumpwood-streamlit-pkg/pumpwood_streamlit.html).
 
+# Example
 Example using dashboard example made avaiable by Streamlit oficial
 website.
 ```
@@ -272,3 +274,5 @@ class Dashboard(PumpwoodStreamlitDashboard):
                     - :orange[**States Migration**]: percentage of states with annual inbound/ outbound migration > 50,000
                     ''')
 ```
+
+

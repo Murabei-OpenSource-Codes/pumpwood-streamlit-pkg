@@ -1,16 +1,8 @@
 """Dashboard class to use as base from Pumpwood Streamlit Dashboards."""
-
 import os
-from abc import ABC, abstractmethod
-
 import streamlit as st
+from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
-from streamlit_cookies_controller import CookieController
-
-
-def _get_cookie_manager():
-    """Retrieve Cookie Manager."""
-    return CookieController()
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -58,15 +50,13 @@ class PumpwoodStreamlitDashboard(ABC):
             Return True if user is logged on Pumpwood and False if token
             set at PumpwoodAuthorization is invalid.
         """
-        cookie_manager = _get_cookie_manager()
-        print(cookie_manager.getAll())
-        cookie_auth_token = cookie_manager.get("PumpwoodAuthorization")
+        context_cookies = dict(st.context.cookies)
+        cookie_auth_token = context_cookies.get("PumpwoodAuthorization")
         if cookie_auth_token is not None:
             self._auth_token = {"Authorization": "Token " + cookie_auth_token}
 
         is_logged = self._microservice.check_if_logged(
-            auth_header=self._auth_token
-        )
+            auth_header=self._auth_token)
         return is_logged
 
     def authentication_error_page(self) -> None:
