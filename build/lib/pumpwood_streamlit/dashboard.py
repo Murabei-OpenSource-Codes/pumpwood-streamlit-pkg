@@ -38,8 +38,8 @@ class PumpwoodStreamlitDashboard(ABC):
                 )
             else:
                 msg = (
-                    "'microservice' is not set as argument and "
-                    + "'MICROSERVICE_URL' not set as enviroment variable"
+                    "'microservice' is not set as argument and " +
+                    "'MICROSERVICE_URL' not set as enviroment variable"
                 )
                 raise Exception(msg)
 
