@@ -1,5 +1,6 @@
 """Dashboard class to use as base from Pumpwood Streamlit Dashboards."""
-import sys, os
+import os
+import traceback
 import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
@@ -94,16 +95,15 @@ class PumpwoodStreamlitDashboard(ABC):
 
         Render a default page for PumpwoodStreamlitException.
         """
-        exc_type, exc_obj, exc_tb = sys.exc_info()
-        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-
         exception_dict = exception.to_dict()
-        st.header("Error when running dashboard")
-        context = (
-            "File: {fname} [{line}]\n{message}").format(
-                fname=fname, line=exc_tb.tb_lineno,
-                message=exception_dict['message'])
-        st.text(context)
+        tb = traceback.format_exc()
+        with st.container():
+            st.header("Error when running dashboard")
+            st.text(exception_dict['message'])
+
+        with st.container():
+            with st.expander("Debug traceback"):
+                st.write(tb)
 
     def run(self) -> None:
         """Render Streamlit dashboard.
