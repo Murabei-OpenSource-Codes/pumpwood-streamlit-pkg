@@ -3,12 +3,14 @@ import os
 import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
+from pumpwood_communication.exceptions import PumpWoodException
+from pumpwood_streamlit.exceptions import PumpwoodStreamlitException
 
 
 class PumpwoodStreamlitDashboard(ABC):
     """Abstract Class to facilitate criation of Streamlit Dashboards."""
 
-    def __init__(self, microservice: PumpWoodMicroService = None):
+    def __init__(self, debug_microservice: PumpWoodMicroService = None):
         """__init__.
 
         It is possible to init object with a microservice to help
@@ -21,26 +23,41 @@ class PumpwoodStreamlitDashboard(ABC):
         to user impersonation.
 
         Args:
-            microservice:
+            debug_microservice:
                  An microservice can be passed to object for developing
                  and debug.
         """
         # Set auth_header to None, this will permit dev microservice to
         # use credencials and prod get auth header from cookie
         self._auth_token = None
-        if microservice is not None:
-            self._microservice = microservice
+
+        # Set 'TRUE' if streamlit was deployed, this will prevent
+        # deploying Dashboard with logged microservice (disable auth)
+        # on production and local docker-compose
+        is_PUMPWOODSTREAMLIT__DEPLOY = os.getenv(
+            "PUMPWOOD_STREAMLIT__DEPLOY", "FALSE") == "TRUE"
+        if debug_microservice is not None:
+            if is_PUMPWOODSTREAMLIT__DEPLOY:
+                msg = (
+                    "PUMPWOOD_STREAMLIT__DEPLOY env variable is set as "
+                    "'TRUE', but a debug_microservice object was passed "
+                    "as argument.")
+                raise PumpwoodStreamlitException(msg)
+            self._microservice = debug_microservice
+
+        # If a debug microservice is not set, them create one using
+        # `MICROSERVICE_URL`, microservice will use auth_header to
+        # loging on backend.
         else:
             MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")
             if MICROSERVICE_URL is not None:
                 self._microservice = PumpWoodMicroService(
-                    name="dashboard-microservice", server_url=MICROSERVICE_URL
-                )
+                    name="dashboard-microservice",
+                    server_url=MICROSERVICE_URL)
             else:
                 msg = (
                     "'microservice' is not set as argument and " +
-                    "'MICROSERVICE_URL' not set as enviroment variable"
-                )
+                    "'MICROSERVICE_URL' not set as enviroment variable")
                 raise Exception(msg)
 
     def validate_authentication(self) -> bool:
@@ -70,6 +87,16 @@ class PumpwoodStreamlitDashboard(ABC):
         ```
         """
         st.title("User token is invalid, log in again to refresh token.")
+
+    def error_handler(self, exception: PumpWoodException) -> bool:
+        """
+        Handle PumpwoodStreamlitException errors.
+
+        Render a default page for PumpwoodStreamlitException.
+        """
+        exception_dict = exception.to_dict()
+        st.header("Error when running dashboard")
+        st.text(exception_dict['message'])
 
     def run(self) -> None:
         """Render Streamlit dashboard.
@@ -138,8 +165,13 @@ class PumpwoodStreamlitDashboard(ABC):
             # Authorization error
             self.authentication_error_page()
         else:
-            # Render main Dashboard View
-            self.main_view()
+            # Render main Dashboard View, if any PumpwoodStreamlitException
+            # errors were raised, them treat them and return a default
+            # error page.
+            try:
+                self.main_view()
+            except PumpWoodException as e:
+                self.error_handler(exception=e)
 
     @abstractmethod
     def set_page_config(self) -> None:
