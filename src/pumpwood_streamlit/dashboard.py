@@ -5,79 +5,23 @@ import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
 from pumpwood_communication.exceptions import PumpWoodException
-from pumpwood_streamlit.exceptions import PumpwoodStreamlitException
+from pumpwood_streamlit.authentication import StreamlitAutheticationABC
 
 
 class PumpwoodStreamlitDashboard(ABC):
     """Abstract Class to facilitate criation of Streamlit Dashboards."""
 
-    def __init__(self):
-        """__init__.
+    @property
+    @abstractmethod
+    def streamlit_auth(self) -> StreamlitAutheticationABC:
+        """Object of sub-class StreamlitAutheticationABC."""
+        pass
 
-        It is possible to init object with a microservice to help
-        building dashboard.
-
-        If microservice=None (production deploy), `__init__` will create an
-        unlogged microservice object using `MICROSERVICE_URL` from enviroment
-        variable. Authentication validation function will set attribute
-        `auth_header` with `PumpwoodAuthorization` token that can be used
-        to user impersonation.
-
-        Args:
-            debug_microservice:
-                 An microservice can be passed to object for developing
-                 and debug.
-        """
-        # If env variable DEBUG_AUTHORIZATION_TOKEN is set then set
-        # header for local development
-        DEBUG_AUTHORIZATION_TOKEN = \
-            os.getenv("DEBUG_AUTHORIZATION_TOKEN")
-
-        # Use deploy variable to not deploy dashboards with
-        # DEBUG_AUTHORIZATION_TOKEN
-        DEPLOY = os.getenv("DEPLOY", "FALSE") == "TRUE"
-
-        if DEBUG_AUTHORIZATION_TOKEN:
-            if DEPLOY:
-                msg = (
-                    "Should not use 'DEBUG_AUTHORIZATION_TOKEN' env " +
-                    "variable on production.")
-                raise PumpwoodStreamlitException(msg)
-            else:
-                self.auth_header = {
-                    "Authorization": DEBUG_AUTHORIZATION_TOKEN}
-        else:
-            self.auth_header = None
-
-        # If a debug microservice is not set, them create one using
-        # `MICROSERVICE_URL`, microservice will use auth_header to
-        # loging on backend.
-        MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")
-        if MICROSERVICE_URL is not None:
-            self.microservice = PumpWoodMicroService(
-                name="dashboard-microservice",
-                server_url=MICROSERVICE_URL)
-        else:
-            msg = (
-                "'microservice' is not set as argument and " +
-                "'MICROSERVICE_URL' not set as enviroment variable")
-            raise PumpwoodStreamlitException(msg)
-
-    def validate_authentication(self) -> bool:
-        """Validate authentication using cookie with PumpwoodAuthorization.
-
-        Returns:
-            Return True if user is logged on Pumpwood and False if token
-            set at PumpwoodAuthorization is invalid.
-        """
-        context_cookies = dict(st.context.cookies)
-        cookieauth_header = context_cookies.get("PumpwoodAuthorization")
-        if cookieauth_header is not None:
-            self.auth_header = {"Authorization": "Token " + cookieauth_header}
-
-        is_logged = self.microservice.check_if_logged(
-            auth_header=self.auth_header)
-        return is_logged
+    @property
+    @abstractmethod
+    def microservice(self) -> PumpWoodMicroService:
+        """Object of PumpWoodMicroService."""
+        pass
 
     def authentication_error_page(self) -> None:
         """Set the authentication error page.
@@ -148,7 +92,7 @@ class PumpwoodStreamlitDashboard(ABC):
         self.set_style()
 
         # Validate auth_header
-        is_logged = self.validate_authentication()
+        is_logged = self.streamlit_auth.check_if_logged()
         if not is_logged:
             # Authorization error
             self.authentication_error_page()
@@ -186,7 +130,7 @@ class PumpwoodStreamlitDashboard(ABC):
         enviroment variable, it default as `styles`.
         """
         PUMPWOOD_DASHBOARD__STYLES_DIR = \
-            os.getenv("PUMPWOOD_DASHBOARD__STYLES_DIR", "styles")
+            os.getenv("PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles")
         all_styles = []
         for file in os.listdir(PUMPWOOD_DASHBOARD__STYLES_DIR):
             if file.endswith(".css"):
