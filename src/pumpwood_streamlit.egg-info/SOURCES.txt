@@ -3,8 +3,10 @@ MANIFEST.in
 README.md
 setup.py
 src/pumpwood_streamlit/__init__.py
+src/pumpwood_streamlit/authentication.py
 src/pumpwood_streamlit/dashboard.py
 src/pumpwood_streamlit/exceptions.py
+src/pumpwood_streamlit/state_manager.py
 src/pumpwood_streamlit.egg-info/PKG-INFO
 src/pumpwood_streamlit.egg-info/SOURCES.txt
 src/pumpwood_streamlit.egg-info/dependency_links.txt

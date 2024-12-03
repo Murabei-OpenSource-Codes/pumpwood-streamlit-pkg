@@ -11,24 +11,7 @@ import os
 from dashboard import Dashboard
 from pumpwood_communication.microservices import PumpWoodMicroService
 
-##########################################################################
-# Read env variables to be used on local test of the dashboard.          #
-# Passing a logged microservice to dashboard will disable authentication #
-# !!! DO NOT USE AUTHENTICATED MICROSERVICE IN PRODUCTION DASHBOARDS !!! #
-MICROSERVICE_URL = os.getenv('MICROSERVICE_URL')
-MICROSERVICE_DASHBOARD_USERNAME = os.getenv('MICROSERVICE_DASHBOARD_USERNAME')
-MICROSERVICE_DASHBOARD_PASSWORD = os.getenv('MICROSERVICE_DASHBOARD_PASSWORD')
-
-microservice = None
-if MICROSERVICE_DASHBOARD_USERNAME is not None:
-    microservice = PumpWoodMicroService(
-        name="dashboard-microservice",
-        server_url=MICROSERVICE_URL,
-        username=MICROSERVICE_DASHBOARD_USERNAME,
-        password=MICROSERVICE_DASHBOARD_PASSWORD,)
-    microservice.login()
-
-dash_obj = Dashboard(microservice=microservice)
+dash_obj = Dashboard()
 dash_obj.run()
 ```
 
@@ -40,9 +23,13 @@ import pandas as pd
 import altair as alt
 import plotly.express as px
 from pumpwood_streamlit.dashboard import PumpwoodStreamlitDashboard
+from singletons import microservice, streamlit_auth
 
 
 class Dashboard(PumpwoodStreamlitDashboard):
+    microservice = microservice
+    streamlit_auth = streamlit_auth
+
     def set_page_config(self):
         #######################
         # Page configuration
