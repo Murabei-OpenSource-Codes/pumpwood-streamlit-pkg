@@ -21,11 +21,10 @@ class StreamlitAuthenticationABC(ABC):
 
     @abstractmethod
     def check_if_logged(self, raise_error: bool = True):
-        """
-        Check if auth_header if logged.
+        """Check if auth_header if logged.
 
         Args:
-            raise_error (bool) = True:
+            raise_error (bool):
                 If user is not autorized will raise error if true and
                 return false if `raise_error=False`.
         """
@@ -35,15 +34,12 @@ class StreamlitAuthenticationABC(ABC):
 class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
     """Class for auth validation using Pumpwood end-points."""
 
-    auth_header: dict
-    """Auth header asssociated with session."""
-
     microservice: PumpWoodMicroService
     """PumpWoodMicroService object to validate if auth_header is correct."""
 
     def __init__(self, microservice: PumpWoodMicroService):
         """__init__."""
-        self.auth_header = None
+        self.debug_auth_header = None
         self.microservice = microservice
 
         # If env variable DEBUG_AUTHORIZATION_TOKEN is set then set
@@ -60,26 +56,26 @@ class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
                     "Should not use 'DEBUG_AUTHORIZATION_TOKEN' env " +
                     "variable on production.")
                 raise PumpwoodStreamlitConfigException(msg)
-            else:
-                self.auth_header = {
-                    "Authorization": DEBUG_AUTHORIZATION_TOKEN}
 
     def get_auth_header(self):
         """Get auth header from cookies token."""
-        if self.auth_header is None:
-            context_cookies = dict(st.context.cookies)
-            cookieauth_header = context_cookies.get("PumpwoodAuthorization")
-            if cookieauth_header is not None:
-                self.auth_header = {
-                    "Authorization": 'Token ' + cookieauth_header}
-        return self.auth_header
+        DEBUG_AUTHORIZATION_TOKEN = \
+            os.getenv("DEBUG_AUTHORIZATION_TOKEN")
+        if DEBUG_AUTHORIZATION_TOKEN is not None:
+            return {"Authorization": DEBUG_AUTHORIZATION_TOKEN}
+
+        context_cookies = dict(st.context.cookies)
+        cookieauth_header = context_cookies.get("PumpwoodAuthorization")
+        if cookieauth_header is not None:
+            return {"Authorization": 'Token ' + cookieauth_header}
+        else:
+            return None
 
     def check_if_logged(self, raise_error: bool = True):
-        """
-        Check if auth_header if logged.
+        """Check if auth_header if logged.
 
         Args:
-            raise_error (bool) = True:
+            raise_error (bool):
                 If user is not autorized will raise error if true and
                 return false if `raise_error=False`.
         """
@@ -90,6 +86,5 @@ class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
             msg = (
                 "Authentication header is not valid, try to login again on "
                 "application.")
-            raise PumpwoodStreamlitUnauthorizedException(
-                message=msg)
+            raise PumpwoodStreamlitUnauthorizedException(message=msg)
         return is_logged
