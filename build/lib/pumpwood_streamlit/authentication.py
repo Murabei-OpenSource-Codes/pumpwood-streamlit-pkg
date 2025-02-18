@@ -1,4 +1,4 @@
-"""Class to help fetching authetication headers from Streamlit."""
+"""Class to help fetching Authentication headers from Streamlit."""
 import os
 import streamlit as st
 from abc import ABC, abstractmethod
@@ -8,7 +8,7 @@ from pumpwood_streamlit.exceptions import (
     PumpwoodStreamlitConfigException)
 
 
-class StreamlitAutheticationABC(ABC):
+class StreamlitAuthenticationABC(ABC):
     """Abstract class to implement Autentication on Streamlit."""
 
     auth_header: dict
@@ -32,7 +32,7 @@ class StreamlitAutheticationABC(ABC):
         pass
 
 
-class StreamlitPumpwoodAuthetication(StreamlitAutheticationABC):
+class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
     """Class for auth validation using Pumpwood end-points."""
 
     auth_header: dict
@@ -88,7 +88,7 @@ class StreamlitPumpwoodAuthetication(StreamlitAutheticationABC):
             auth_header=auth_header)
         if not is_logged and raise_error:
             msg = (
-                "Authetication header is not valid, try to login again on "
+                "Authentication header is not valid, try to login again on "
                 "application.")
             raise PumpwoodStreamlitUnauthorizedException(
                 message=msg)

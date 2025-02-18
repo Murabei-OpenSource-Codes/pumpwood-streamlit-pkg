@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: pumpwood-streamlit
 Version: 0.14.0
 Summary: Package to deploy Streamlit at Pumpwood Systems
@@ -6,12 +6,24 @@ Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-communication
 Author: André Andrade Baceti
 Author-email: a.baceti@murabei.com
 License: BSD-3-Clause License
-Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: OS Independent
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE
+Requires-Dist: streamlit
+Requires-Dist: extra-streamlit-components
+Requires-Dist: streamlit-cookies-controller
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 # pumpwood-streamlit-pkg
 Python Package to deploy Streamlit Dashboards at Pumpwood Systems.
@@ -274,5 +286,3 @@ class Dashboard(PumpwoodStreamlitDashboard):
                     - :orange[**States Migration**]: percentage of states with annual inbound/ outbound migration > 50,000
                     ''')
 ```
-
-

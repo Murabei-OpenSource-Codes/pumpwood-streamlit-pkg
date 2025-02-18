@@ -5,7 +5,7 @@ import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
 from pumpwood_communication.exceptions import PumpWoodException
-from pumpwood_streamlit.authentication import StreamlitAutheticationABC
+from pumpwood_streamlit.authentication import StreamlitAuthenticationABC
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -13,8 +13,8 @@ class PumpwoodStreamlitDashboard(ABC):
 
     @property
     @abstractmethod
-    def streamlit_auth(self) -> StreamlitAutheticationABC:
-        """Object of sub-class StreamlitAutheticationABC."""
+    def streamlit_auth(self) -> StreamlitAuthenticationABC:
+        """Object of sub-class StreamlitAuthenticationABC."""
         pass
 
     @property
