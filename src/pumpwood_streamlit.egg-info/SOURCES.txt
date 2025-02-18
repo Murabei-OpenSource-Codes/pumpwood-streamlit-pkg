@@ -1,6 +1,7 @@
 LICENSE
 MANIFEST.in
 README.md
+pyproject.toml
 setup.py
 src/pumpwood_streamlit/__init__.py
 src/pumpwood_streamlit/authentication.py

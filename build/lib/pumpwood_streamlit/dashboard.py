@@ -5,7 +5,9 @@ import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
 from pumpwood_communication.exceptions import PumpWoodException
-from pumpwood_streamlit.authentication import StreamlitAutheticationABC
+from pumpwood_streamlit.authentication import StreamlitAuthenticationABC
+from pumpwood_streamlit.exceptions import (
+    PumpwoodStreamlitUnauthorizedException)
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -13,8 +15,8 @@ class PumpwoodStreamlitDashboard(ABC):
 
     @property
     @abstractmethod
-    def streamlit_auth(self) -> StreamlitAutheticationABC:
-        """Object of sub-class StreamlitAutheticationABC."""
+    def streamlit_auth(self) -> StreamlitAuthenticationABC:
+        """Object of sub-class StreamlitAuthenticationABC."""
         pass
 
     @property
@@ -36,8 +38,7 @@ class PumpwoodStreamlitDashboard(ABC):
         st.title("User token is invalid, log in again to refresh token.")
 
     def error_handler(self, exception: PumpWoodException) -> bool:
-        """
-        Handle PumpwoodStreamlitException errors.
+        """Handle PumpwoodStreamlitException errors.
 
         Render a default page for PumpwoodStreamlitException.
         """
@@ -91,19 +92,18 @@ class PumpwoodStreamlitDashboard(ABC):
         self.set_page_config()
         self.set_style()
 
-        # Validate auth_header
-        is_logged = self.streamlit_auth.check_if_logged()
-        if not is_logged:
-            # Authorization error
+        # Render main Dashboard View, if any PumpwoodStreamlitException
+        # errors were raised, them treat them and return a default
+        # error page.
+        try:
+            self.streamlit_auth.check_if_logged()
+            self.main_view()
+        except PumpwoodStreamlitUnauthorizedException:
             self.authentication_error_page()
-        else:
-            # Render main Dashboard View, if any PumpwoodStreamlitException
-            # errors were raised, them treat them and return a default
-            # error page.
-            try:
-                self.main_view()
-            except PumpWoodException as e:
-                self.error_handler(exception=e)
+        except PumpWoodException as e:
+            self.error_handler(exception=e)
+        except Exception as e:
+            raise e
 
     @abstractmethod
     def set_page_config(self) -> None:
@@ -122,8 +122,7 @@ class PumpwoodStreamlitDashboard(ABC):
         raise NotImplementedError(msg)
 
     def set_style(self) -> None:
-        """
-        Set style associated with dashboard.
+        """Set style associated with dashboard.
 
         Read all css files at a style folder and add them to dashboard.
         Styles folder is set using `PUMPWOOD_DASHBOARD__STYLES_DIR`

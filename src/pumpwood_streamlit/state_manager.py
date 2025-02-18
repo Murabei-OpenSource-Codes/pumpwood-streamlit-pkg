@@ -3,8 +3,7 @@ import streamlit as st
 import inspect
 from typing import Any, Callable, List
 from pumpwood_streamlit.exceptions import (
-    PumpwoodStreamlitConfigException, PumpwoodStreamlitException,
-    PumpwoodStreamlitStateNotFoundException)
+    PumpwoodStreamlitConfigException, PumpwoodStreamlitStateNotFoundException)
 from abc import ABC
 
 
@@ -108,8 +107,7 @@ class StateManager:
     @classmethod
     def init(cls, state: str, init_value: Any = None,
              force_value: bool = False) -> str:
-        """
-        Initiate state using value.
+        """Initiate state using value.
 
         It will not update state value, unless force_value is set as `True`.
         For setting data use set method instead, this is should be used to
@@ -123,7 +121,7 @@ class StateManager:
                 Name of the state that will be initiated.
             init_value (Any):
                 Value that will be set as initial value for state.
-            force_value (bool) = False:
+            force_value (bool):
                 Default value will not change states that are already present
                 at streamlit states. Setting `force_value (bool) = True` will
                 reverse this behaivor.
@@ -141,8 +139,7 @@ class StateManager:
     @classmethod
     def get_value(cls, state: str, default_value: Any = "__empty_value__",
                   **kwargs) -> Any:
-        """
-        Get value from streamlit `session_state`.
+        """Get value from streamlit `session_state`.
 
         It will run the triggers associated with get operation.
         StateBeforeGetTrigger will run before get and StateAfterGetTrigger
@@ -156,10 +153,11 @@ class StateManager:
             default_value (Any):
                 Return a default value if state is not found on Streamlit
                 states.
-        Kwargs:
-            Other arguments will be passed as kwargs to function associated
-            with the triggers.
-        Return:
+            **kwargs (dict):
+                Other arguments will be passed as kwargs to function associated
+                with the triggers.
+
+        Returns:
             Return value of `pumpwood_st__{state}` state found on Streamlit
             state.
         """
@@ -202,8 +200,7 @@ class StateManager:
     @classmethod
     def set_value(cls, state: str, value: Any, ignore_init_error: bool = False,
                   **kwargs):
-        """
-        Set state at streamlit `session_state`.
+        """Set state at streamlit `session_state`.
 
         It will run the triggers associated with set operation.
         StateBeforeSetTrigger will run before get and StateAfterSetTrigger
@@ -217,10 +214,13 @@ class StateManager:
             value (Any):
                 Value that will be setted at `pumpwood_st__{state}` on
                 Streamlit state.
-        Kwargs:
-            Other arguments will be passed as kwargs to function associated
-            with the triggers.
-        Return:
+            ignore_init_error (bool):
+                Ignore error if state is not init before set.
+            **kwargs (dict):
+                Other arguments will be passed as kwargs to function associated
+                with the triggers.
+
+        Returns:
             Return value of `pumpwood_st__{state}` state found on Streamlit
             state.
         """
