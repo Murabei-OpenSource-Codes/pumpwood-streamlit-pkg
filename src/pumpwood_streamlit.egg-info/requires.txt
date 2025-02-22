@@ -1,3 +1,8 @@
 streamlit
 extra-streamlit-components
 streamlit-cookies-controller
+pandas
+lxml
+pyarrow
+pumpwood_communication>=2.2.4
+openpyxl

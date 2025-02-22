@@ -46,4 +46,18 @@ class Dashboard(PumpwoodStreamlitDashboard):
         # Load data
         st.title('O dash mudou!')
 ```
+
+## Enviroment variables:
+Some enviroment can be used to debug and modify behaivor of the package
+functions. Here are they description:
+- **DEBUG_FILES_PATH:** Set the path to save data that is
+    init and set at states using `StateManager`. This may help to debug
+    dashboard, files will be saved at folder `{debug_path}/{state_name}` and
+    file name `{state_name}__{type}__{time}.{extension}`.
+- **DEBUG_AUTHORIZATION_TOKEN:** This variable can be set to by pass defautl
+    authentication. This will help at the development reducing the time
+    of authentication at each local test.
+- **DEPLOY:** If by default will be set as `TRUE` on docker images,
+    this is a safe lock to throw error will `DEBUG_AUTHORIZATION_TOKEN` is
+    not None and DEPLOY is `TRUE`
 """

@@ -39,7 +39,9 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     install_requires=[
-        "streamlit", "extra-streamlit-components", "streamlit-cookies-controller"],
+        "streamlit", "extra-streamlit-components",
+        "streamlit-cookies-controller", "pandas", "lxml",
+        "pyarrow", 'pumpwood_communication>=2.2.4', 'openpyxl'],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
 )
