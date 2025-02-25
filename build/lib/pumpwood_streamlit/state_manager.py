@@ -111,7 +111,6 @@ class StateManager:
             data (any):
                 State data that will be saved for debug.
         """
-        print("debug_data", state_name, operation_type)
         TEMPLATE_FOLDER = '{debug_path}/{state_name}'
         TEMPLATE_FILE = '{state_name}__{type}__{time}.{extension}'
         debug_path = os.getenv('DEBUG_FILES_PATH')
