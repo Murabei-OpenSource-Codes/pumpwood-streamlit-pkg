@@ -1,6 +1,6 @@
 Metadata-Version: 2.2
 Name: pumpwood-streamlit
-Version: 0.15.1
+Version: 0.16.0
 Summary: Package to deploy Streamlit at Pumpwood Systems
 Home-page: https://github.com/Murabei-OpenSource-Codes/pumpwood-communication
 Author: André Andrade Baceti
@@ -14,6 +14,11 @@ License-File: LICENSE
 Requires-Dist: streamlit
 Requires-Dist: extra-streamlit-components
 Requires-Dist: streamlit-cookies-controller
+Requires-Dist: pandas
+Requires-Dist: lxml
+Requires-Dist: pyarrow
+Requires-Dist: pumpwood_communication>=2.2.4
+Requires-Dist: openpyxl
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier

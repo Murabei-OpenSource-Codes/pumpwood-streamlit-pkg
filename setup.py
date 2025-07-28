@@ -24,7 +24,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setuptools.setup(
     name='pumpwood-streamlit',
-    version='0.15.1',
+    version='0.16.0',
     include_package_data=True,
     license='BSD-3-Clause License',
     description='Package to deploy Streamlit at Pumpwood Systems',
@@ -39,7 +39,9 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     install_requires=[
-        "streamlit", "extra-streamlit-components", "streamlit-cookies-controller"],
+        "streamlit", "extra-streamlit-components",
+        "streamlit-cookies-controller", "pandas", "lxml",
+        "pyarrow", 'pumpwood_communication>=2.2.4', 'openpyxl'],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
 )

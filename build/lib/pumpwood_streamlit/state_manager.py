@@ -1,10 +1,15 @@
 """Class to help to manager app states get/set triggers."""
+import os
+import logging
 import streamlit as st
 import inspect
+import datetime
+import pandas as pd
+from abc import ABC
 from typing import Any, Callable, List
 from pumpwood_streamlit.exceptions import (
     PumpwoodStreamlitConfigException, PumpwoodStreamlitStateNotFoundException)
-from abc import ABC
+from pumpwood_communication.serializers import pumpJsonDump
 
 
 class StateTrigger(ABC):
@@ -90,6 +95,105 @@ class StateManager:
     ```
     """
     @classmethod
+    def debug_data(cls, state_name: str, operation_type: str,
+                   data: Any) -> None:
+        """Save state data for debuging when states are set or init.
+
+        If will try to convert dataframe data to excel and parquet, other
+        types of object will be serialized as json.
+
+        Args:
+            state_name (str):
+                Name of the state for debug.
+            operation_type (str):
+                Type of the operartion that will be debuged, it
+                is implemented for init and set operations.
+            data (any):
+                State data that will be saved for debug.
+        """
+        TEMPLATE_FOLDER = '{debug_path}/{state_name}'
+        TEMPLATE_FILE = '{state_name}__{type}__{time}.{extension}'
+        debug_path = os.getenv('DEBUG_FILES_PATH')
+        if debug_path is None:
+            return None
+
+        tmp_time = datetime.datetime.now().strftime("%Y-%m-%d--%Hh%Mm%ss")
+        folder_debug = TEMPLATE_FOLDER\
+            .format(debug_path=debug_path, state_name=state_name)
+        # Create state debug data folder
+        os.makedirs(folder_debug, exist_ok=True)
+
+        # Salve Pandas Dataframes as parquet and excel files if possible
+        if isinstance(data, pd.DataFrame):
+            file_name = TEMPLATE_FILE.format(
+                state_name=state_name, type=operation_type, time=tmp_time,
+                extension="xlsx")
+            file_path = os.path.join(folder_debug, file_name)
+            try:
+                data.to_excel(file_path, index=False)
+            except Exception as e:
+                msg = (
+                    "If was not possible to save {file_path} for debug. "
+                    "Error raised:\n{error}")
+                logging.warning(
+                    msg.format(file_path=file_path, error=str(e)))
+
+            file_name = TEMPLATE_FILE.format(
+                state_name=state_name, type=operation_type, time=tmp_time,
+                extension="parquet")
+            file_path = os.path.join(folder_debug, file_name)
+            try:
+                data.to_parquet(file_path, engine="pyarrow")
+            except Exception as e:
+                msg = (
+                    "If was not possible to save {file_path} for debug. "
+                    "Error raised:\n{error}")
+                logging.warning(msg.format(file_path=file_path, error=str(e)))
+
+        # Salve Pandas Dataframes as parquet and excel files if possible
+        elif isinstance(data, pd.Series):
+            file_name = TEMPLATE_FILE.format(
+                state_name=state_name, type=operation_type, time=tmp_time,
+                extension="xlsx")
+            file_path = os.path.join(folder_debug, file_name)
+            try:
+                data.to_frame().to_excel(file_path, index=False)
+            except Exception as e:
+                msg = (
+                    "If was not possible to save {file_path} for debug. "
+                    "Error raised:\n{error}")
+                logging.warning(msg.format(file_path=file_path, error=str(e)))
+
+            file_name = TEMPLATE_FILE.format(
+                state_name=state_name, type=operation_type, time=tmp_time,
+                extension="parquet")
+            file_path = os.path.join(folder_debug, file_name)
+            try:
+                data.to_frame().to_parquet(file_path, engine="pyarrow")
+            except Exception as e:
+                msg = (
+                    "If was not possible to save {file_path} for debug. "
+                    "Error raised:\n{error}")
+                logging.warning(msg.format(file_path=file_path, error=str(e)))
+
+        else:
+            file_name = TEMPLATE_FILE.format(
+                state_name=state_name, type=operation_type, time=tmp_time,
+                extension="json")
+            file_path = os.path.join(folder_debug, file_name)
+
+            try:
+                json_data = pumpJsonDump(data, indent=2)
+            except Exception as e:
+                msg = (
+                    "If was not possible to serialize {file_path} for debug. "
+                    "Error raised:\n{error}")
+                logging.warning(msg.format(file_path=file_path, error=str(e)))
+
+            with open(file_path, 'w') as file:
+                file.write(json_data)
+
+    @classmethod
     def does_state_exists(cls, state: str,
                           raise_if_not_found: bool = True) -> bool:
         """Check if state exists at `st.session_state`."""
@@ -128,13 +232,12 @@ class StateManager:
         """
         if (state not in st.session_state) or force_value:
             st.session_state[state] = init_value
-        return state
 
-    @classmethod
-    def get_state(cls, state: str) -> Any:
-        """Get state from Streamlit state."""
-        cls.does_state_exists(state=state)
-        return st.session_state[state]
+            # Debug
+            cls.debug_data(
+                state_name=state, operation_type='init',
+                data=init_value)
+        return state
 
     @classmethod
     def get_value(cls, state: str, default_value: Any = "__empty_value__",
@@ -254,6 +357,11 @@ class StateManager:
         # Get state value or return the default_value
         st.session_state[state] = value
 
+        # Debug
+        cls.debug_data(
+            state_name=state, operation_type='set',
+            data=value)
+
         # Run all trigger of after get after fetching state information
         for trigger in state_name_triggers:
             if isinstance(trigger, StateAfterSetTrigger):
@@ -261,7 +369,7 @@ class StateManager:
         return True
 
     @classmethod
-    def get_states(cls) -> dict:
+    def get_states_and_triggers(cls) -> dict:
         """Get Streamlit states and associated triggers.
 
         Return:
