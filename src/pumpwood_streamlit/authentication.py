@@ -1,5 +1,6 @@
 """Class to help fetching Authentication headers from Streamlit."""
 import os
+import copy
 import streamlit as st
 from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
@@ -62,12 +63,10 @@ class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
         DEBUG_AUTHORIZATION_TOKEN = \
             os.getenv("DEBUG_AUTHORIZATION_TOKEN")
         if DEBUG_AUTHORIZATION_TOKEN is not None:
-            print('DEBUG_AUTHORIZATION_TOKEN is not None')
             return {"Authorization": DEBUG_AUTHORIZATION_TOKEN}
 
-        context_cookies = dict(st.context.cookies)
+        context_cookies = copy.deepcopy(dict(st.context.cookies))
         cookieauth_header = context_cookies.get("PumpwoodAuthorization")
-        print('cookieauth_header:', cookieauth_header)
         if cookieauth_header is not None:
             return {"Authorization": 'Token ' + cookieauth_header}
         else:
