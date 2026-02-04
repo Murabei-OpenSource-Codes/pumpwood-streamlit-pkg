@@ -4,7 +4,6 @@ README.md
 pyproject.toml
 setup.py
 src/pumpwood_streamlit/__init__.py
-src/pumpwood_streamlit/authentication.py
 src/pumpwood_streamlit/dashboard.py
 src/pumpwood_streamlit/exceptions.py
 src/pumpwood_streamlit/state.py
@@ -14,3 +13,6 @@ src/pumpwood_streamlit.egg-info/SOURCES.txt
 src/pumpwood_streamlit.egg-info/dependency_links.txt
 src/pumpwood_streamlit.egg-info/requires.txt
 src/pumpwood_streamlit.egg-info/top_level.txt
+src/pumpwood_streamlit/authentication/__init__.py
+src/pumpwood_streamlit/authentication/pumpwood/__init__.py
+src/pumpwood_streamlit/authentication/pumpwood/controller.py
