@@ -27,12 +27,13 @@ class PumpwoodStreamlitRegister:
                 name=MICROSERVICE_NAME, server_url=MICROSERVICE_URL,
                 username=MICROSERVICE_USERNAME, password=MICROSERVICE_PASSWORD)
             microservice.login()
-        except Exception:
+        except Exception as e:
             msg = (
                 "I was not possible to login at auth using "
                 "'{microservice_username}' service user")\
                 .format(microservice_username=MICROSERVICE_USERNAME)
             logger.error(msg)
+            raise e
 
         # Register Service
         print("## Registering streamlit dashboard: [{}]".format(
@@ -48,10 +49,11 @@ class PumpwoodStreamlitRegister:
                 'dimensions': {
                     "microservice": "pumpwood-streamlit-dashboard",
                     "dashboard_name": DASHBOARD_NAME}})
-        except Exception:
+        except Exception as e:
             msg = ("Error when registering service: {service_url}")\
                 .format(service_url=SERVICE_URL)
             logger.error(msg)
+            raise e
 
         route_url = "/streamlit/" + DASHBOARD_NAME
         try:
@@ -71,7 +73,8 @@ class PumpwoodStreamlitRegister:
                 "icon": None,
                 "extra_info": {}}
             microservice.save(route_object)
-        except Exception:
+        except Exception as e:
             msg = ("Error when registering route: {route_url}")\
                 .format(route_url=route_url)
             logger.error(msg)
+            raise e
