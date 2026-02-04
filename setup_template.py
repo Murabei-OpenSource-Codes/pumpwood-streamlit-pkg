@@ -41,7 +41,8 @@ setuptools.setup(
     install_requires=[
         "streamlit", "extra-streamlit-components",
         "streamlit-cookies-controller", "pandas", "lxml",
-        "pyarrow", 'pumpwood_communication>=2.2.4', 'openpyxl'],
+        "pyarrow", 'pumpwood_communication>=2.2.4', 'openpyxl',
+        "loguru>=0.7.3"],
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
 )

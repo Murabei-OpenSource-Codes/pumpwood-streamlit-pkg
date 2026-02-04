@@ -6,3 +6,4 @@ lxml
 pyarrow
 pumpwood_communication>=2.2.4
 openpyxl
+loguru>=0.7.3

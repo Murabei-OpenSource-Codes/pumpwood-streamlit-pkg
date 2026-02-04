@@ -6,6 +6,7 @@ setup.py
 src/pumpwood_streamlit/__init__.py
 src/pumpwood_streamlit/dashboard.py
 src/pumpwood_streamlit/exceptions.py
+src/pumpwood_streamlit/register.py
 src/pumpwood_streamlit/state.py
 src/pumpwood_streamlit/state_manager.py
 src/pumpwood_streamlit.egg-info/PKG-INFO
