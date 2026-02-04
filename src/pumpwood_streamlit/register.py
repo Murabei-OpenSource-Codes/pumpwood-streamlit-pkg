@@ -53,8 +53,8 @@ class PumpwoodStreamlitRegister:
                 .format(service_url=SERVICE_URL)
             logger.error(msg)
 
+        route_url = "/streamlit/" + DASHBOARD_NAME
         try:
-            route_url = "/streamlit/" + DASHBOARD_NAME
             route_object = {
                 "model_class": "KongRoute",
                 "service_id": service_object["pk"],
