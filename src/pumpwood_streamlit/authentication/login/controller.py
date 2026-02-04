@@ -1,42 +1,22 @@
 """Class to help fetching Authentication headers from Streamlit."""
 import os
-import copy
-import streamlit as st
-from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
+from pumpwood_streamlit.state_manager import StateManager
+from pumpwood_streamlit.authentication.abc.controller import (
+    StreamlitAuthenticationABC)
 from pumpwood_streamlit.exceptions import (
     PumpwoodStreamlitUnauthorizedException,
     PumpwoodStreamlitConfigException)
 
 
-class StreamlitAuthenticationABC(ABC):
-    """Abstract class to implement Autentication on Streamlit."""
+class StreamlitUserAuthentication(StreamlitAuthenticationABC):
+    """Create a authentication based on user login.
 
-    auth_header: dict
-    """Auth header asssociated with session."""
+    Authentication that can be used with user login at streamlit. Auth header
+    token is read from states.
+    """
 
-    @abstractmethod
-    def get_auth_header(self, refetch: bool = False):
-        """Get auth header from cookies token."""
-        pass
-
-    @abstractmethod
-    def check_if_logged(self, raise_error: bool = True):
-        """Check if auth_header if logged.
-
-        Args:
-            raise_error (bool):
-                If user is not autorized will raise error if true and
-                return false if `raise_error=False`.
-        """
-        pass
-
-
-class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
-    """Class for auth validation using Pumpwood end-points."""
-
-    microservice: PumpWoodMicroService
-    """PumpWoodMicroService object to validate if auth_header is correct."""
+    AUTH_TOKEN_STATE = "PumpwoodAuthorizationToken" # NOQA
 
     def __init__(self, microservice: PumpWoodMicroService):
         """__init__."""
@@ -58,19 +38,34 @@ class StreamlitPumpwoodAuthentication(StreamlitAuthenticationABC):
                     "variable on production.")
                 raise PumpwoodStreamlitConfigException(msg)
 
-    def get_auth_header(self):
-        """Get auth header from cookies token."""
+    def get_auth_header(self) -> dict:
+        """Get auth header from streamlit state."""
         DEBUG_AUTHORIZATION_TOKEN = \
             os.getenv("DEBUG_AUTHORIZATION_TOKEN")
         if DEBUG_AUTHORIZATION_TOKEN is not None:
             return {"Authorization": DEBUG_AUTHORIZATION_TOKEN}
 
-        context_cookies = copy.deepcopy(dict(st.context.cookies))
-        cookieauth_header = context_cookies.get("PumpwoodAuthorization")
-        if cookieauth_header is not None:
-            return {"Authorization": 'Token ' + cookieauth_header}
-        else:
-            return None
+        # Retrieve token from states
+        auth_header = StateManager.get_value(
+            state=self.AUTH_TOKEN_STATE, default_value={})
+        return auth_header
+
+    def set_auth_header(self, auth_header: dict):
+        """Set auth token on streamlit state.
+
+        Args:
+            auth_header (str):
+                Token used to login on Pumpwood.
+        """
+        return StateManager.set_value(
+            state=self.AUTH_TOKEN_STATE, value=auth_header,
+            ignore_init_error=True)
+
+    def logout(self):
+        """Logout from dashboard."""
+        StateManager.set_value(
+            state=self.AUTH_TOKEN_STATE, value=None,
+            ignore_init_error=True)
 
     def check_if_logged(self, raise_error: bool = True):
         """Check if auth_header if logged.
