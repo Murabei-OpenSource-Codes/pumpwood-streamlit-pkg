@@ -11,7 +11,100 @@ from pumpwood_streamlit.exceptions import (
 
 
 class PumpwoodStreamlitDashboard(ABC):
-    """Abstract Class to facilitate criation of Streamlit Dashboards."""
+    """Abstract Class to facilitate criation of Streamlit Dashboards.
+
+    Attributes:
+        URL_PARAMS (dict):
+            Dictionary defining expected URL query parameters.
+            Each key is a parameter name and value is a dict
+            with configuration:
+                - required (bool): If True, the parameter must
+                  be present for `has_url_params()` to return
+                  True. If False, the parameter is optional.
+                - default (str): Default value when param is
+                  not present. Only used for optional params.
+
+            When all required params are present in the URL,
+            `has_url_params()` returns True and filters should
+            be hidden.
+
+            Example:
+            ```python
+            URL_PARAMS = {
+                "code": {"required": True},
+                "variable": {"required": True},
+                "date_init": {
+                    "required": False, "default": None},
+                "date_end": {
+                    "required": False, "default": None},
+            }
+            ```
+    """
+
+    URL_PARAMS = {}
+    """URL query parameters configuration dictionary."""
+
+    @classmethod
+    def get_url_params(cls):
+        """Extract and validate query params from URL.
+
+        Checks if all required parameters (required=True) are
+        present in `st.query_params`. If they are, returns a
+        dictionary with all parameter values as raw strings.
+        If any required parameter is missing, returns None.
+
+        Returns:
+            dict or None:
+                Dictionary with parameter values as strings,
+                or None if required params are missing.
+
+        Example:
+            ```python
+            # URL: ?code=ABC&variable=potencia-ativa
+            params = Dashboard.get_url_params()
+            # params = {
+            #     "code": "ABC",
+            #     "variable": "potencia-ativa",
+            #     "date_init": None,
+            #     "date_end": None,
+            # }
+
+            # URL sem params obrigatórios:
+            params = Dashboard.get_url_params()
+            # params = None
+            ```
+        """
+        params = {}
+        for param_name, config in cls.URL_PARAMS.items():
+            is_required = config.get("required", False)
+            default = config.get("default", None)
+            value = st.query_params.get(param_name, None)
+
+            if value is None and is_required:
+                return None
+            params[param_name] = value or default
+        return params
+
+    @classmethod
+    def has_url_params(cls):
+        """Check if all required URL query params are present.
+
+        Returns:
+            bool:
+                True if all required parameters defined in
+                URL_PARAMS are present in the URL.
+
+        Example:
+            ```python
+            def main_view(self):
+                if self.has_url_params():
+                    params = self.get_url_params()
+                    # Render URL header, hide filters
+                else:
+                    # Render filter bar
+            ```
+        """
+        return cls.get_url_params() is not None
 
     @property
     @abstractmethod
