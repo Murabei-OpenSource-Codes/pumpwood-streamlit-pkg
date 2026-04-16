@@ -1,4 +1,5 @@
 """Dashboard class to use as base from Pumpwood Streamlit Dashboards."""
+
 import os
 import traceback
 import streamlit as st
@@ -6,8 +7,10 @@ from abc import ABC, abstractmethod
 from pumpwood_communication.microservices import PumpWoodMicroService
 from pumpwood_communication.exceptions import PumpWoodException
 from pumpwood_streamlit.authentication import StreamlitAuthenticationABC
+from pumpwood_streamlit.query_params import decode_url_params
 from pumpwood_streamlit.exceptions import (
-    PumpwoodStreamlitUnauthorizedException)
+    PumpwoodStreamlitUnauthorizedException,
+)
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -106,6 +109,60 @@ class PumpwoodStreamlitDashboard(ABC):
         """
         return cls.get_url_params() is not None
 
+    @classmethod
+    def render_filters_section(cls, render_grid, filter_keys=None, **kwargs):
+        """Organize the filter section depending on the mode.
+
+        If valid parameters are found in the URL (URL mode), the manual
+        filter grid is omitted. Otherwise, the grid rendering function
+        is executed.
+
+        Workflow:
+            Start -> Normal Mode
+              |
+            Has URL?
+              |
+            Yes -> Evaluate filters
+              |
+            Values valid? -> URL Mode (grid hidden)
+              |
+            Else -> Normal Mode (grid shown)
+
+        Args:
+            render_grid (callable): Function that renders the
+                dashboard's manual filter grid.
+            filter_keys (list, optional): List of keys that, if present
+                in the decoded JSON, activate URL mode. If None, any
+                content in the JSON activates the mode.
+            **kwargs: Arguments passed to the grid function.
+
+        Example:
+            >>> def my_filters(plant_id):
+            ...     st.selectbox("Select Plant", [1, 2], key="plant_id")
+            >>> dashboard.render_filters_section(
+            ...     render_grid=my_filters,
+            ...     filter_keys=["plant_id"],
+            ...     plant_id=1
+            ... )
+        """
+        is_url_mode = False
+        if cls.has_url_params():
+            raw = cls.get_url_params()
+            url_params = decode_url_params(raw)
+
+            if filter_keys:
+                # If any of the specified keys are present
+                is_url_mode = any(
+                    url_params.get(k) is not None for k in filter_keys
+                )
+            else:
+                # If there is anything in the dictionary
+                is_url_mode = len(url_params) > 0
+
+        if not is_url_mode:
+            with st.container():
+                render_grid(**kwargs)
+
     @property
     @abstractmethod
     def streamlit_auth(self) -> StreamlitAuthenticationABC:
@@ -139,7 +196,7 @@ class PumpwoodStreamlitDashboard(ABC):
         tb = traceback.format_exc()
         with st.container():
             st.header("Error when running dashboard")
-            st.text(exception_dict['message'])
+            st.text(exception_dict["message"])
 
         with st.container():
             with st.expander("Debug traceback"):
@@ -221,22 +278,23 @@ class PumpwoodStreamlitDashboard(ABC):
         Styles folder is set using `PUMPWOOD_DASHBOARD__STYLES_DIR`
         enviroment variable, it default as `styles`.
         """
-        PUMPWOOD_DASHBOARD__STYLES_DIR = \
-            os.getenv("PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles")
+        PUMPWOOD_DASHBOARD__STYLES_DIR = os.getenv(
+            "PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles"
+        )
         all_styles = []
         for file in os.listdir(PUMPWOOD_DASHBOARD__STYLES_DIR):
             if file.endswith(".css"):
                 file_path = os.path.join(PUMPWOOD_DASHBOARD__STYLES_DIR, file)
                 file_break = (
-                    "\n/* ### Styles from file [{file}] ### */").format(
-                        file=file)
+                    "\n/* ### Styles from file [{file}] ### */"
+                ).format(file=file)
                 all_styles.append(file_break)
                 with open(file_path, "r") as file:
                     all_styles.append(file.read())
-        css = '\n'.join(all_styles)
+        css = "\n".join(all_styles)
         st.markdown(
-            "<style> {css} </style>".format(css=css),
-            unsafe_allow_html=True)
+            "<style> {css} </style>".format(css=css), unsafe_allow_html=True
+        )
 
     @abstractmethod
     def main_view(self) -> None:
