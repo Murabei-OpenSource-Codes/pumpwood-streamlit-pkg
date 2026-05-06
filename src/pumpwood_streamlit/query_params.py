@@ -11,10 +11,14 @@ import binascii
 
 
 class URLParams:
-    """Class to facilitate management of URL Params."""
+    """Class to facilitate management of URL Params.
+
+    Attributes:
+        URL_PARAMS (dict): URL query parameters configuration dictionary
+            defining required and default values.
+    """
 
     URL_PARAMS = {}
-    """URL query parameters configuration dictionary."""
 
     @classmethod
     def get_url_params(cls):
@@ -26,8 +30,7 @@ class URLParams:
         If any required parameter is missing, returns None.
 
         Returns:
-            dict or None:
-                Dictionary with parameter values as strings,
+            dict or None: Dictionary with parameter values as strings,
                 or None if required params are missing.
 
         Example:
@@ -59,8 +62,7 @@ class URLParams:
         """Check if all required URL query params are present.
 
         Returns:
-            bool:
-                True if all required parameters defined in
+            bool: True if all required parameters defined in
                 URL_PARAMS are present in the URL.
 
         Example:
@@ -129,14 +131,15 @@ class URLParams:
 
     @staticmethod
     def decode_url_params(raw_params, key="params"):
-        """Decode a URL-safe base64 encoded JSON from a dictionary.
+        """Decode a URL-safe base64 encoded JSON string from a dictionary.
 
         Args:
             raw_params (dict): Dictionary with raw URL parameters.
-            key (str): Key containing the base64 string. Default is "params".
+            key (str): Key containing the base64 string. Defaults to "params".
 
         Returns:
-            dict: Decoded dictionary content or empty dict if fails.
+            dict: Decoded dictionary content or an empty dict if decoding,
+                UTF-8 conversion, or JSON parsing fails.
         """
         if not raw_params:
             return {}
