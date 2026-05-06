@@ -1,0 +1,1 @@
+"""View for login errors."""
