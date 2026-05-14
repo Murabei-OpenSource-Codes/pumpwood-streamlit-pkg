@@ -1,4 +1,5 @@
 """Dashboard class to use as base from Pumpwood Streamlit Dashboards."""
+
 import os
 import traceback
 import streamlit as st
@@ -7,7 +8,8 @@ from pumpwood_communication.microservices import PumpWoodMicroService
 from pumpwood_communication.exceptions import PumpWoodException
 from pumpwood_streamlit.authentication import StreamlitAuthenticationABC
 from pumpwood_streamlit.exceptions import (
-    PumpwoodStreamlitUnauthorizedException)
+    PumpwoodStreamlitUnauthorizedException,
+)
 
 
 class PumpwoodStreamlitDashboard(ABC):
@@ -46,7 +48,7 @@ class PumpwoodStreamlitDashboard(ABC):
         tb = traceback.format_exc()
         with st.container():
             st.header("Error when running dashboard")
-            st.text(exception_dict['message'])
+            st.text(exception_dict["message"])
 
         with st.container():
             with st.expander("Debug traceback"):
@@ -128,22 +130,23 @@ class PumpwoodStreamlitDashboard(ABC):
         Styles folder is set using `PUMPWOOD_DASHBOARD__STYLES_DIR`
         enviroment variable, it default as `styles`.
         """
-        PUMPWOOD_DASHBOARD__STYLES_DIR = \
-            os.getenv("PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles")
+        PUMPWOOD_DASHBOARD__STYLES_DIR = os.getenv(
+            "PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles"
+        )
         all_styles = []
         for file in os.listdir(PUMPWOOD_DASHBOARD__STYLES_DIR):
             if file.endswith(".css"):
                 file_path = os.path.join(PUMPWOOD_DASHBOARD__STYLES_DIR, file)
                 file_break = (
-                    "\n/* ### Styles from file [{file}] ### */").format(
-                        file=file)
+                    "\n/* ### Styles from file [{file}] ### */"
+                ).format(file=file)
                 all_styles.append(file_break)
                 with open(file_path, "r") as file:
                     all_styles.append(file.read())
-        css = '\n'.join(all_styles)
+        css = "\n".join(all_styles)
         st.markdown(
-            "<style> {css} </style>".format(css=css),
-            unsafe_allow_html=True)
+            "<style> {css} </style>".format(css=css), unsafe_allow_html=True
+        )
 
     @abstractmethod
     def main_view(self) -> None:
