@@ -1,6 +1,6 @@
 [project]
 name = "pumpwood-streamlit"
-version = "2.4.42-b.0"
+version = "{VERSION}"
 description = "Package to deploy Streamlit at Pumpwood Systems"
 readme = "README.md"
 requires-python = ">=3.6,<4.0"

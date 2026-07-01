@@ -1,15 +1,41 @@
-"""Register Dashboard on Auth App."""
+"""Register Streamlit dashboard service and route at Kong.
+
+``PumpwoodStreamlitRegister.run()`` is called at deploy time to
+create a Kong service and route for the dashboard.
+
+Required environment variables:
+
+- ``MICROSERVICE_NAME``, ``MICROSERVICE_URL``,
+  ``MICROSERVICE_USERNAME``, ``MICROSERVICE_PASSWORD``: Auth
+  microservice credentials.
+- ``SERVICE_URL``: Internal URL of the Streamlit container.
+- ``DASHBOARD_NAME``: Short name used in route
+  ``/streamlit/{DASHBOARD_NAME}``.
+"""
 import os
 from loguru import logger
 from pumpwood_communication.microservices import PumpWoodMicroService
 
 
 class PumpwoodStreamlitRegister:
-    """Class to help register dashboard on pumpwood routes."""
+    """Register a Streamlit dashboard as a Kong service and route.
+
+    Reads configuration from environment variables and persists a
+    ``KongService`` and ``KongRoute`` via ``PumpWoodMicroService``.
+    """
 
     @classmethod
     def run(cls):
-        """Run Dashboard registering on Pumpwood routes."""
+        """Register dashboard service and route at Kong.
+
+        Reads environment variables, logs into the auth microservice,
+        creates a ``KongService`` and ``KongRoute`` for the dashboard.
+
+        Raises:
+            Exception:
+                If login, service registration, or route registration
+                fails.
+        """
         # Microservice
         MICROSERVICE_NAME = os.getenv("MICROSERVICE_NAME")
         MICROSERVICE_URL = os.getenv("MICROSERVICE_URL")

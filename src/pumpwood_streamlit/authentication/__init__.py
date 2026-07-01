@@ -1,4 +1,13 @@
-"""Module for autentication asssociated with Streamlit dashboards."""
+"""Authentication backends for Streamlit dashboards.
+
+Exports:
+
+- ``StreamlitAuthenticationABC``: abstract base class.
+- ``StreamlitPumpwoodAuthentication``: cookie-based auth via
+  ``PumpwoodAuthorization``.
+- ``StreamlitUserAuthentication``: username/password login form.
+- ``StreamlitUserAuthenticationLoginView``: login page view.
+"""
 # Controlers
 from pumpwood_streamlit.authentication.abc.controller import (
     StreamlitAuthenticationABC, )
