@@ -28,29 +28,21 @@ class PumpwoodStreamlitDashboard(ABC):
         pass
 
     def authentication_error_page(self) -> None:
-        """Render the page shown when authentication fails.
+        """Set the authentication error page.
 
-        Called by ``run()`` when ``streamlit_auth.check_if_logged()``
-        raises ``PumpwoodStreamlitUnauthorizedException``.
+        This function is called if self.validate_login() return False.
 
         Example:
         ```python
-        st.title(
-            'User token is invalid, log in again to refresh token.')
+        st.title('User token is invalid, log in again to refresh token.')
         ```
         """
         st.title("User token is invalid, log in again to refresh token.")
 
     def error_handler(self, exception: PumpWoodException) -> bool:
-        """Render a default error page for PumpWood exceptions.
+        """Handle PumpwoodStreamlitException errors.
 
-        Args:
-            exception (PumpWoodException):
-                Exception raised during dashboard execution.
-
-        Returns:
-            bool:
-                Always returns False (reserved for future use).
+        Render a default page for PumpwoodStreamlitException.
         """
         exception_dict = exception.to_dict()
         tb = traceback.format_exc()
@@ -65,22 +57,37 @@ class PumpwoodStreamlitDashboard(ABC):
     def run(self) -> None:
         """Render Streamlit dashboard.
 
-        Entry point for ``app.py``. Sets page config and styles,
-        validates authentication via ``streamlit_auth.check_if_logged()``,
-        then calls ``main_view()``. Catches
-        ``PumpwoodStreamlitUnauthorizedException`` and
-        ``PumpWoodException`` with default handlers.
+        This function is used as an entry point for app.py Streamlit
+        dashboard.
 
-        Should rarely be overridden. If overridden, call
-        ``self.streamlit_auth.check_if_logged()`` before
-        ``main_view()``.
+        Most of the cases should not be reimplemented. It is important
+        that if reimplemented `is_logged = self.validate_authentication()`
+        function must be called at the beggin to assure that user is
+        authenticated on Pumpwood.
 
         Example of an app.py:
         ```
+        import os
         from dashboard import Dashboard
 
         dash_obj = Dashboard()
         dash_obj.run()
+        ```
+
+        Implemented run function:
+        ```python
+        def run(self) -> None:
+            # Set page configuration
+            self.set_page_config()
+
+            # Validate auth_header
+            is_logged = self.validate_authentication()
+            if not is_logged:
+                # Authorization error
+                self.authentication_error_page()
+            else:
+                # Render main Dashboard View
+                self.main_view()
         ```
         """
         # Set page configuration
@@ -117,11 +124,11 @@ class PumpwoodStreamlitDashboard(ABC):
         raise NotImplementedError(msg)
 
     def set_style(self) -> None:
-        """Load CSS files into the dashboard.
+        """Set style associated with dashboard.
 
-        Reads all ``.css`` files from the directory set by
-        ``PUMPWOOD_DASHBOARD__STYLES_DIR`` (default:
-        ``static/styles``) and injects them via ``st.markdown``.
+        Read all css files at a style folder and add them to dashboard.
+        Styles folder is set using `PUMPWOOD_DASHBOARD__STYLES_DIR`
+        enviroment variable, it default as `styles`.
         """
         PUMPWOOD_DASHBOARD__STYLES_DIR = os.getenv(
             "PUMPWOOD_DASHBOARD__STYLES_DIR", "static/styles"

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<<<<<<< HEAD
 ## [0.18.10] - 2026-04-16
 
 ### Added
@@ -21,6 +22,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   string from URL params back into a dict.
 - Add `render_filters_section()` method to organize the filter
   section depending on the mode (URL mode or Normal mode).
+=======
+## [0.18.12] - 2026-05-06
+### Added
+- Add `URLParams` class in `query_params.py` to facilitate management
+  of URL parameters with base64/JSON encoding.
+- Add `URL_PARAMS` attribute to `URLParams` class for declarative
+  configuration of query params.
+- Add `has_url_params()` method to check if all required URL params
+  are present.
+- Add `get_url_params()` method to retrieve raw URL param values.
+- Add `render_filters_section()` method to conditionally render the
+  filter grid based on the presence of valid URL params.
+- Add `encode_url_params()` and `decode_url_params()` utility methods
+  for base64/JSON conversion.
+
+### Changed
+- No changes.
+
+### Removed
+- No changes.
+>>>>>>> 54e51a0821098ae9bf05e0459638332f2fe82c90
 
 ## [0.18.7] - 2026-02-02
 

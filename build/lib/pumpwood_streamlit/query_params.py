@@ -1,26 +1,7 @@
 """Utility functions for URL parameter parsing and encoding.
 
-<<<<<<< HEAD
-Provides base64/JSON encode and decode helpers used by
-``PumpwoodStreamlitDashboard.render_filters_section()`` to read
-filter values from deep-link query strings.
-
-Typical usage:
-
-```python
-from pumpwood_streamlit.query_params import (
-    decode_url_params, encode_url_params)
-
-encoded = encode_url_params({"plant_id": 1, "date": "2026-01-01"})
-# URL: ?params=<encoded>
-
-raw = {"params": encoded}
-filters = decode_url_params(raw)
-```
-=======
 This module provides URL-safe base64/JSON decoding and encoding for
 URL parameters without project-specific knowledge.
->>>>>>> 54e51a0821098ae9bf05e0459638332f2fe82c90
 """
 
 import base64
