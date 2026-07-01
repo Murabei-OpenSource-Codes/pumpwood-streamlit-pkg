@@ -1,26 +1,26 @@
 """Utility functions for URL parameter parsing and encoding.
 
-<<<<<<< HEAD
-Provides base64/JSON encode and decode helpers used by
-``PumpwoodStreamlitDashboard.render_filters_section()`` to read
-filter values from deep-link query strings.
+Provides the ``URLParams`` utility class with URL-safe base64/JSON
+encode and decode helpers. Configure ``URLParams.URL_PARAMS`` and
+call its class methods from the dashboard — no inheritance required.
 
 Typical usage:
 
 ```python
-from pumpwood_streamlit.query_params import (
-    decode_url_params, encode_url_params)
+from pumpwood_streamlit.query_params import URLParams
 
-encoded = encode_url_params({"plant_id": 1, "date": "2026-01-01"})
-# URL: ?params=<encoded>
+URLParams.URL_PARAMS = {"params": {"required": True}}
 
-raw = {"params": encoded}
-filters = decode_url_params(raw)
+
+def main_view():
+    def render_filters():
+        st.selectbox("Plant", [1, 2, 3], key="plant_id")
+
+    URLParams.render_filters_section(
+        render_grid=render_filters,
+        filter_keys=["plant_id"],
+    )
 ```
-=======
-This module provides URL-safe base64/JSON decoding and encoding for
-URL parameters without project-specific knowledge.
->>>>>>> 54e51a0821098ae9bf05e0459638332f2fe82c90
 """
 
 import base64
@@ -30,11 +30,18 @@ import binascii
 
 
 class URLParams:
-    """Class to facilitate management of URL Params.
+    """Utility class for URL query parameter management.
+
+    Not intended for inheritance. Set ``URL_PARAMS`` on this class and
+    call ``has_url_params()``, ``get_url_params()``,
+    ``render_filters_section()``, ``encode_url_params()``, or
+    ``decode_url_params()`` directly from the dashboard code.
 
     Attributes:
-        URL_PARAMS (dict): URL query parameters configuration dictionary
-            defining required and default values.
+        URL_PARAMS (dict):
+            Declarative config for expected query parameters.
+            Each key is a param name; value is a dict with
+            ``required`` (bool) and optional ``default``.
     """
 
     URL_PARAMS = {}

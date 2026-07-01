@@ -1,6 +1,6 @@
 [project]
 name = "pumpwood-streamlit"
-version = "2.4.42-b.0"
+version = "0.18.13-b.0"
 description = "Package to deploy Streamlit at Pumpwood Systems"
 readme = "README.md"
 requires-python = ">=3.6,<4.0"
@@ -16,7 +16,6 @@ classifiers = [
 dependencies = [
     "streamlit",
     "extra-streamlit-components",
-    "streamlit-cookies-controller",
     "pandas",
     "lxml",
     "pyarrow",

@@ -21,7 +21,7 @@ state management, and optional URL-driven filter hiding.
   username/password login via `StreamlitUserAuthentication`.
 - **Dashboard base class:** `PumpwoodStreamlitDashboard` with
   `run()`, error handling, and custom CSS loading.
-- **URL parameters:** Declarative `URL_PARAMS` config to hide manual
+- **URL parameters:** ``URLParams`` utility class to hide manual
   filters when a dashboard is opened from a deep link.
 - **Kong registration:** `PumpwoodStreamlitRegister` to register the
   service and route at deploy time.
@@ -49,17 +49,18 @@ dash_obj.run()
 ```python
 import streamlit as st
 from pumpwood_streamlit.dashboard import PumpwoodStreamlitDashboard
+from pumpwood_streamlit.query_params import URLParams
 from pumpwood_streamlit.authentication import StreamlitPumpwoodAuthentication
 from singletons import microservice
+
+URLParams.URL_PARAMS = {
+    "params": {"required": True},
+}
 
 
 class Dashboard(PumpwoodStreamlitDashboard):
     microservice = microservice
     streamlit_auth = StreamlitPumpwoodAuthentication(microservice)
-
-    URL_PARAMS = {
-        "params": {"required": True},
-    }
 
     def set_page_config(self):
         st.set_page_config(
@@ -72,7 +73,7 @@ class Dashboard(PumpwoodStreamlitDashboard):
         def render_filters():
             st.selectbox("Plant", [1, 2, 3], key="plant_id")
 
-        self.render_filters_section(
+        URLParams.render_filters_section(
             render_grid=render_filters,
             filter_keys=["plant_id"],
         )
@@ -90,12 +91,13 @@ When authentication fails, `run()` calls `authentication_error_page()`.
 
 ### URL parameters
 
-Define `URL_PARAMS` on the dashboard class. When all required params
-are present, `has_url_params()` returns `True`. Use
-`render_filters_section()` to skip the manual filter grid in that
-mode. Filter values can be passed as a base64 JSON blob via the
-`params` query key; decode with `decode_url_params()` from
-`pumpwood_streamlit.query_params`.
+Configure ``URLParams.URL_PARAMS`` and call ``URLParams`` methods
+directly from ``main_view()``. When all required params are present,
+``URLParams.has_url_params()`` returns ``True``. Use
+``URLParams.render_filters_section()`` to skip the manual filter grid
+in that mode. Filter values are passed as a URL-safe base64 JSON blob
+via the ``params`` query key; decode with
+``URLParams.decode_url_params()``.
 
 ### Kong registration
 

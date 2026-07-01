@@ -16,7 +16,6 @@ classifiers = [
 dependencies = [
     "streamlit",
     "extra-streamlit-components",
-    "streamlit-cookies-controller",
     "pandas",
     "lxml",
     "pyarrow",

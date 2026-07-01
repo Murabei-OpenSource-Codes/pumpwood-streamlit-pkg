@@ -50,12 +50,25 @@ Assign the chosen backend to the ``streamlit_auth`` class attribute.
 
 ## URL parameters
 
-Set ``URL_PARAMS`` on the dashboard class to declare expected query
-parameters. When all required params are present,
-``has_url_params()`` returns ``True`` and ``render_filters_section()``
-can skip the manual filter grid. Encoded filter values are passed
-as a base64 JSON string; use ``decode_url_params()`` from
-``pumpwood_streamlit.query_params`` to read them.
+``URLParams`` is a utility class — do not subclass it. Set
+``URLParams.URL_PARAMS`` and call its class methods from the
+dashboard. When all required params are present,
+``URLParams.has_url_params()`` returns ``True`` and
+``URLParams.render_filters_section()`` can skip the manual filter
+grid. Encoded filter values use URL-safe base64 JSON via the
+``params`` query key.
+
+```python
+from pumpwood_streamlit.query_params import URLParams
+
+URLParams.URL_PARAMS = {"params": {"required": True}}
+
+# inside main_view():
+URLParams.render_filters_section(
+    render_grid=render_filters,
+    filter_keys=["plant_id"],
+)
+```
 
 ## Kong registration
 
