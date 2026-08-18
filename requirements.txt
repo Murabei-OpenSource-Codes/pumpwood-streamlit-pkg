@@ -1,0 +1,10 @@
+streamlit
+extra-streamlit-components
+streamlit-cookies-controller
+pandas
+lxml
+pyarrow
+pumpwood-communication>=2.2.4
+openpyxl
+loguru>=0.7.3
+pdoc
